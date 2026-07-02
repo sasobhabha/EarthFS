@@ -1,0 +1,22 @@
+{
+  "name": "earthfs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  },
+  "dependencies": {
+    "3d-tiles-renderer": "^0.4.28",
+    "cesium": "^1.143.0",
+    "three": "^0.185.1",
+    "vite-plugin-cesium": "^1.2.23"
+  }
+}
