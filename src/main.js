@@ -799,10 +799,7 @@ function setupModalListeners() {
 		document.getElementById('creditsModal').classList.remove('hidden');
 	};
 
-	document.getElementById('aboutBtn').onclick = () => {
-		closeAllModals();
-		document.getElementById('aboutBtnModal').classList.remove('hidden');
-	};
+
 
 
 
