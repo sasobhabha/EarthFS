@@ -1,4 +1,4 @@
-# Earth Flight Simulator
+# EarthFS
 
 A browser-based full-featured flight simulator built with WebGL (Three.js) and Google Maps Photorealistic 3D Tiles.
 

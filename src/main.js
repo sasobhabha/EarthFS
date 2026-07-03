@@ -7,7 +7,7 @@ import { movePosition } from './utils/math';
 import { calculateDistance, reverseGeocode } from './world/regions';
 import { HUD } from './ui/hud';
 import { JetFlame } from './plane/jetFlame';
-import { WeaponSystem } from './systems/weaponSystem';
+
 import { soundManager } from './utils/soundManager';
 import { NPCSystem } from './systems/npcSystem';
 import { DialogueSystem } from './systems/dialogueSystem';
@@ -126,8 +126,7 @@ let state = {
 	roll: 0,
 	speed: 0,
 	throttle: 0,
-	score: 0,
-	weaponSystem: null
+	score: 0
 };
 
 async function initUserLocation() {
@@ -161,7 +160,7 @@ let physics = new PlanePhysics();
 let controller = new PlaneController();
 let hud = new HUD();
 let npcSystem;
-let weaponSystem;
+
 let dialogueSystem = new DialogueSystem();
 
 let fps = 0;
@@ -253,19 +252,13 @@ async function initSounds() {
 		soundManager.loadSound('explosion-2', '/assets/sounds/explosion-2.mp3', false, 0.8),
 		soundManager.loadSound('explosion-3', '/assets/sounds/explosion-3.mp3', false, 0.8),
 		soundManager.loadSound('ambient-crash', '/assets/sounds/ambient.mp3', true, 0.5),
-		soundManager.loadSound('weapon-warning', '/assets/sounds/weapon-warning-1.mp3', false, 1.0),
+
 		soundManager.loadSound('jet-engine', '/assets/sounds/jet-engine.mp3', true, 0.5),
 		soundManager.loadSound('spawn', '/assets/sounds/spawn.mp3', false, 0.5),
 		soundManager.loadSound('roll', '/assets/sounds/roll.mp3', true, 0.75),
 		soundManager.loadSound('pitch', '/assets/sounds/pitch.mp3', true, 0.75),
 		soundManager.loadSound('button-click', '/assets/sounds/button-click.mp3', false, 1.0),
-		soundManager.loadSound('weapon-switch', '/assets/sounds/weapon-switch.mp3', false, 0.75),
-		soundManager.loadSound('button-hover', '/assets/sounds/button-hover.mp3', false, 0.25),
-		soundManager.loadSound('zoom-in', '/assets/sounds/zoom-in.mp3', false, 0.5),
-		soundManager.loadSound('missile-fire', '/assets/sounds/missile-firing-1.mp3', false, 0.75),
-		soundManager.loadSound('m61-firing', '/assets/sounds/m61-firing.mp3', true, 0.75),
-		soundManager.loadSound('rwr-tws', '/assets/sounds/rwr-tws.mp3', true, 0.2),
-		soundManager.loadSound('rwr-lock', '/assets/sounds/rwr-lock.mp3', false, 0.2),
+
 		soundManager.loadSound('wind', '/assets/sounds/wind.mp3', true, 0.25),
 		soundManager.loadSound('terrain-pull-up', '/assets/sounds/terrain-pull-up.mp3', false, 0.9),
 		soundManager.loadSound('warning', '/assets/sounds/warning.mp3', false, 0.6),
@@ -372,14 +365,7 @@ function initThree() {
 		planeModel.add(flameR.group);
 		jetFlames.push(flameL, flameR);
 
-		weaponSystem = new WeaponSystem(getViewer(), scene, planeModel);
-		weaponSystem.onKill = (npc) => {
-			state.score += 1000;
-			try { soundManager.play('glitch-random'); } catch (e) { }
-			if (hud) {
-				hud.showKillNotification(npc.name, 1000);
-			}
-		};
+
 
 		planeModel.traverse(child => {
 			child.layers.set(1);
@@ -415,24 +401,7 @@ function update(dt) {
 	state.throttle = input.throttle;
 	state.yaw = input.yaw;
 	state.isBoosting = physicsResult.isBoosting;
-	state.weaponSystem = weaponSystem;
 	state.npcs = npcSystem ? npcSystem.npcs : [];
-
-	if (weaponSystem) {
-		if (input.weaponIndex !== -1) {
-			weaponSystem.selectWeapon(input.weaponIndex);
-		}
-		if (input.toggleWeapon) {
-			weaponSystem.toggleWeapon();
-		}
-		if (input.fire) {
-			weaponSystem.fire(state);
-		}
-		if (input.fireFlare) {
-			weaponSystem.fireFlare(state);
-		}
-		weaponSystem.update(dt, state, input);
-	}
 
 	const newPos = movePosition(state.lon, state.lat, state.alt, state.heading, state.pitch, state.speed * dt);
 	state.lon = newPos.lon;
@@ -693,8 +662,7 @@ function checkCrash() {
 		currentState = States.CRASHED;
 		if (dialogueSystem) dialogueSystem.stop();
 		uiContainer.classList.add('hidden');
-		const weaponsHud = document.getElementById('weapons-hud');
-		if (weaponsHud) weaponsHud.classList.add('hidden');
+
 		threeContainer.classList.add('hidden');
 		crashMenu.classList.remove('hidden');
 		hud.update(state, []);
@@ -1203,9 +1171,7 @@ document.getElementById('confirmSpawnBtn').onclick = () => {
 		hud.resetTime();
 		hud.resizeMinimap();
 
-		if (weaponSystem && typeof weaponSystem.resetAmmo === 'function') {
-			weaponSystem.resetAmmo();
-		}
+
 
 		if (npcSystem) {
 			npcSystem.spawnNPC(state.lon, state.lat, state.alt);
@@ -1230,8 +1196,7 @@ document.getElementById('confirmSpawnBtn').onclick = () => {
 			complete: () => {
 				flightStartTime = Date.now();
 				uiContainer.classList.remove('hidden');
-				const weaponsHud = document.getElementById('weapons-hud');
-				if (weaponsHud) weaponsHud.classList.remove('hidden');
+
 				threeContainer.classList.remove('hidden');
 				hud.resizeMinimap();
 				currentState = States.FLYING;
@@ -1261,8 +1226,7 @@ window.addEventListener('keydown', (e) => {
 			currentState = States.PAUSED;
 			if (dialogueSystem) dialogueSystem.pause();
 			uiContainer.classList.add('hidden');
-			const weaponsHud = document.getElementById('weapons-hud');
-			if (weaponsHud) weaponsHud.classList.add('hidden');
+
 			pauseMenu.classList.remove('hidden');
 			hud.resizeMinimap();
 			pauseGameplaySounds();
@@ -1272,8 +1236,7 @@ window.addEventListener('keydown', (e) => {
 			if (dialogueSystem) dialogueSystem.resume();
 			pauseMenu.classList.add('hidden');
 			uiContainer.classList.remove('hidden');
-			const weaponsHud = document.getElementById('weapons-hud');
-			if (weaponsHud) weaponsHud.classList.remove('hidden');
+
 			resumeGameplaySounds();
 		} else if (currentState === States.PICK_SPAWN && key === 'escape') {
 			exitSpawnPicking();

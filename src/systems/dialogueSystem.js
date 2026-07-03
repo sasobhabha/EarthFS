@@ -9,12 +9,11 @@ export class DialogueSystem {
 			"You are currently piloting the F-15 Eaglehawk, an advanced air superiority fighter.",
 			"Check your HUD. The left box shows your SPEED in knots, and the right box shows your ALTITUDE.",
 			"The compass at the top shows your heading, and the crosshair in the center helps you level your flight.",
-			"Your weapons are armed. You have the M61A1 Vulcan Cannon and AIM-9 Sidewinder missiles.",
+			"You are cleared for flight.",
 			"Use 'W' and 'S' to control your throttle. Keep an eye on your energy state.",
 			"Control your pitch and roll with the ARROW keys. Use 'A' and 'D' for rudder control.",
 			"Engage afterburners with SPACE for maximum thrust, but watch your fuel consumption.",
-			"Cycle your weapons with '1', '2', or 'Q'. Press 'F' or ENTER to engage your targets.",
-			"If you detect an incoming threat, press 'V' to release flares and break the lock.",
+			"Good luck out there, commander.",
 			"The tactical minimap at the bottom right shows your radar contacts and current region.",
 			"Good luck out there, Pilot. Commander Manjunath, out."
 		];
