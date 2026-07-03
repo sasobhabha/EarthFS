@@ -39,21 +39,7 @@ export class HUD {
 		this.killScoreElem = document.getElementById('kill-score');
 		this.killTimeout = null;
 
-		this.weaponElems = {
-			gun: document.getElementById('weapon-gun'),
-			missile: document.getElementById('weapon-missile'),
-			flare: document.getElementById('weapon-flare')
-		};
-		this.weaponAmmoElems = {
-			gun: this.weaponElems.gun.querySelector('.weapon-ammo'),
-			missile: this.weaponElems.missile.querySelector('.weapon-ammo'),
-			flare: this.weaponElems.flare.querySelector('.weapon-ammo')
-		};
-		this.weaponProgressElems = {
-			gun: this.weaponElems.gun.querySelector('.weapon-progress'),
-			missile: this.weaponElems.missile.querySelector('.weapon-progress'),
-			flare: this.weaponElems.flare.querySelector('.weapon-progress')
-		};
+
 
 		this.vignette = document.getElementById('transition-vignette');
 
@@ -558,9 +544,7 @@ export class HUD {
 
 		this.speedElem.innerText = Math.round(state.speed).toString().padStart(3, '0');
 
-		if (state.weaponSystem) {
-			this.updateWeapons(state.weaponSystem);
-		}
+
 
 		let compassHeading = this.smoothedHeading;
 		while (compassHeading < 0) compassHeading += 360;
@@ -905,22 +889,8 @@ export class HUD {
 		marker.dot.style.display = 'none';
 		marker.offscreenName.style.display = 'none';
 
-		const ws = state.weaponSystem;
-		if (ws && ws.lockingTarget === npc) {
-			marker.lockBox.style.display = 'block';
-			if (ws.lockStatus === 'LOCKED') {
-				marker.lockBox.classList.remove('locking-blink');
-				marker.lockBox.style.borderColor = '#0f0';
-				marker.lockBox.innerHTML = '<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-weight:bold; color:#0f0; font-size:12px; text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);">LOCK</span>';
-			} else if (ws.lockStatus === 'LOCKING') {
-				marker.lockBox.classList.add('locking-blink');
-				marker.lockBox.style.borderColor = '#0f0';
-				marker.lockBox.innerHTML = '';
-			}
-		} else {
-			marker.lockBox.style.display = 'none';
-			marker.lockBox.innerHTML = '';
-		}
+		marker.lockBox.style.display = 'none';
+		marker.lockBox.innerHTML = '';
 
 		const distKm = (dist / 1000).toFixed(1);
 		const labelText = `${npc.name}\n${distKm} KM`;
@@ -978,76 +948,5 @@ export class HUD {
 		}
 	}
 
-	updateWeapons(weaponSystem) {
-		const currentWeapon = weaponSystem.getCurrentWeapon();
-		const now = performance.now() * 0.001;
 
-		const isMissileSelected = !!currentWeapon && (
-			currentWeapon.id === 'missile' ||
-			currentWeapon.id === 'aim-9' ||
-			(currentWeapon.name && currentWeapon.name.toLowerCase().includes('aim-9'))
-		);
-		this.showMissileCrosshair(isMissileSelected);
-
-		['gun', 'missile', 'flare'].forEach(id => {
-			const elem = this.weaponElems[id];
-			const ammoElem = this.weaponAmmoElems[id];
-			const progressElem = this.weaponProgressElems[id];
-
-			const weapon = id === 'flare' ? weaponSystem.flareWeapon : weaponSystem.weapons.find(w => w.id === id && (id !== 'missile' || w === currentWeapon));
-			const displayWeapon = weapon || (id === 'flare' ? weaponSystem.flareWeapon : weaponSystem.weapons.find(w => w.id === id));
-
-			if (elem) {
-				const isEmptyWarning = weaponSystem.emptyWarningTimers && weaponSystem.emptyWarningTimers[id] > 0;
-				const isActive = (currentWeapon && currentWeapon.id === id) ||
-					(id === 'flare' && (now - weaponSystem.flareWeapon.lastFire < 1.0)) ||
-					isEmptyWarning;
-				const isGunOverheated = id === 'gun' && weaponSystem.isGunOverheated;
-
-				if (isActive) {
-					elem.classList.add('active');
-				} else {
-					elem.classList.remove('active');
-				}
-
-				if (isGunOverheated || isEmptyWarning) {
-					elem.classList.add('overheated');
-				} else {
-					elem.classList.remove('overheated');
-				}
-
-				if (isActive && id === 'missile' && displayWeapon) {
-					const nameElem = elem.querySelector('.weapon-name');
-					if (nameElem) nameElem.innerText = displayWeapon.name;
-				}
-			}
-
-			if (progressElem && displayWeapon) {
-				let progress = 0;
-				if (id === 'gun') {
-					progress = weaponSystem.gunHeat * 100;
-				} else {
-					const timeSinceLast = now - displayWeapon.lastFire;
-					const reloadTime = id === 'flare' ? 1.0 : displayWeapon.fireRate;
-
-					if (timeSinceLast < reloadTime) {
-						progress = (timeSinceLast / reloadTime) * 100;
-					} else {
-						progress = 0;
-					}
-				}
-				progressElem.style.width = `${progress}%`;
-			}
-
-			if (ammoElem && displayWeapon) {
-				if (id === 'gun' && weaponSystem.isGunOverheated) {
-					ammoElem.innerText = 'OVERHEAT';
-				} else if (displayWeapon.ammo === Infinity) {
-					ammoElem.innerText = 'INF';
-				} else {
-					ammoElem.innerText = displayWeapon.ammo.toString().padStart(2, '0');
-				}
-			}
-		});
-	}
 }
