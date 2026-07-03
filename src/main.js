@@ -7,7 +7,6 @@ import { movePosition } from './utils/math';
 import { calculateDistance, reverseGeocode } from './world/regions';
 import { HUD } from './ui/hud';
 import { JetFlame } from './plane/jetFlame';
-import { WeaponSystem } from './systems/weaponSystem';
 import { soundManager } from './utils/soundManager';
 import { NPCSystem } from './systems/npcSystem';
 import { DialogueSystem } from './systems/dialogueSystem';
@@ -63,7 +62,7 @@ function updateSettingsUI() {
 	document.getElementById('showHud').checked = gameSettings.showHud;
 	document.getElementById('showHorizonLines').checked = gameSettings.showHorizonLines;
 	document.getElementById('soundEnabled').checked = gameSettings.soundEnabled;
-	document.getElementById('minimapRange').value = gameSettings.minimapRange.toString();
+	// document.getElementById('minimapRange').value = gameSettings.minimapRange.toString();
 }
 
 function applySettings() {
@@ -74,7 +73,7 @@ function applySettings() {
 	}
 
 	if (hud) {
-		hud.setMinimapRange(gameSettings.minimapRange);
+		// hud.setMinimapRange(gameSettings.minimapRange);
 		hud.setShowHorizonLines(gameSettings.showHorizonLines);
 	}
 
@@ -127,7 +126,6 @@ let state = {
 	speed: 0,
 	throttle: 0,
 	score: 0,
-	weaponSystem: null
 };
 
 async function initUserLocation() {
@@ -161,7 +159,6 @@ let physics = new PlanePhysics();
 let controller = new PlaneController();
 let hud = new HUD();
 let npcSystem;
-let weaponSystem;
 let dialogueSystem = new DialogueSystem();
 
 let fps = 0;
@@ -372,15 +369,6 @@ function initThree() {
 		planeModel.add(flameR.group);
 		jetFlames.push(flameL, flameR);
 
-		weaponSystem = new WeaponSystem(getViewer(), scene, planeModel);
-		weaponSystem.onKill = (npc) => {
-			state.score += 1000;
-			try { soundManager.play('glitch-random'); } catch (e) { }
-			if (hud) {
-				hud.showKillNotification(npc.name, 1000);
-			}
-		};
-
 		planeModel.traverse(child => {
 			child.layers.set(1);
 		});
@@ -415,24 +403,9 @@ function update(dt) {
 	state.throttle = input.throttle;
 	state.yaw = input.yaw;
 	state.isBoosting = physicsResult.isBoosting;
-	state.weaponSystem = weaponSystem;
 	state.npcs = npcSystem ? npcSystem.npcs : [];
 
-	if (weaponSystem) {
-		if (input.weaponIndex !== -1) {
-			weaponSystem.selectWeapon(input.weaponIndex);
-		}
-		if (input.toggleWeapon) {
-			weaponSystem.toggleWeapon();
-		}
-		if (input.fire) {
-			weaponSystem.fire(state);
-		}
-		if (input.fireFlare) {
-			weaponSystem.fireFlare(state);
-		}
-		weaponSystem.update(dt, state, input);
-	}
+
 
 	const newPos = movePosition(state.lon, state.lat, state.alt, state.heading, state.pitch, state.speed * dt);
 	state.lon = newPos.lon;
@@ -692,10 +665,7 @@ function checkCrash() {
 	if (terrainHeight !== undefined && state.alt <= terrainHeight + 5) {
 		currentState = States.CRASHED;
 		if (dialogueSystem) dialogueSystem.stop();
-		uiContainer.classList.add('hidden');
-		const weaponsHud = document.getElementById('weapons-hud');
-		if (weaponsHud) weaponsHud.classList.add('hidden');
-		threeContainer.classList.add('hidden');
+		uiContainer.classList.add('hidden');		threeContainer.classList.add('hidden');
 		crashMenu.classList.remove('hidden');
 		hud.update(state, []);
 
@@ -815,7 +785,7 @@ function setupModalListeners() {
 		gameSettings.showHud = document.getElementById('showHud').checked;
 		gameSettings.showHorizonLines = document.getElementById('showHorizonLines').checked;
 		gameSettings.soundEnabled = document.getElementById('soundEnabled').checked;
-		gameSettings.minimapRange = parseInt(document.getElementById('minimapRange').value);
+		// gameSettings.minimapRange = parseInt(document.getElementById('minimapRange').value);
 
 		saveSettings();
 		applySettings();
@@ -847,10 +817,7 @@ setupModalListeners();
 document.getElementById('resumeBtn').onclick = () => {
 	closeAllModals();
 	pauseMenu.classList.add('hidden');
-	uiContainer.classList.remove('hidden');
-	const weaponsHud = document.getElementById('weapons-hud');
-	if (weaponsHud) weaponsHud.classList.remove('hidden');
-	currentState = States.FLYING;
+	uiContainer.classList.remove('hidden');	currentState = States.FLYING;
 	if (dialogueSystem) dialogueSystem.resume();
 	resumeGameplaySounds();
 };
@@ -890,10 +857,7 @@ function enterSpawnPicking(useVignette = true) {
 	setTimeout(() => {
 		spawnInstruction.classList.remove('hidden');
 		threeContainer.classList.add('hidden');
-		uiContainer.classList.add('hidden');
-		const weaponsHud = document.getElementById('weapons-hud');
-		if (weaponsHud) weaponsHud.classList.add('hidden');
-		currentState = States.PICK_SPAWN;
+		uiContainer.classList.add('hidden');		currentState = States.PICK_SPAWN;
 		confirmSpawnBtn.classList.add('hidden');
 
 		const searchInput = document.getElementById('locationSearch');
@@ -1201,12 +1165,7 @@ document.getElementById('confirmSpawnBtn').onclick = () => {
 		physics.reset(state.lon, state.lat, state.alt, state.heading, state.pitch, state.roll);
 
 		hud.resetTime();
-		hud.resizeMinimap();
-
-		if (weaponSystem && typeof weaponSystem.resetAmmo === 'function') {
-			weaponSystem.resetAmmo();
-		}
-
+		// hud.resizeMinimap();
 		if (npcSystem) {
 			npcSystem.spawnNPC(state.lon, state.lat, state.alt);
 		}
@@ -1229,11 +1188,8 @@ document.getElementById('confirmSpawnBtn').onclick = () => {
 			easingFunction: Cesium.EasingFunction.QUADRATIC_IN_OUT,
 			complete: () => {
 				flightStartTime = Date.now();
-				uiContainer.classList.remove('hidden');
-				const weaponsHud = document.getElementById('weapons-hud');
-				if (weaponsHud) weaponsHud.classList.remove('hidden');
-				threeContainer.classList.remove('hidden');
-				hud.resizeMinimap();
+				uiContainer.classList.remove('hidden');				threeContainer.classList.remove('hidden');
+				// hud.resizeMinimap();
 				currentState = States.FLYING;
 				soundManager.play('jet-engine', 1.0);
 				if (vignette) vignette.style.opacity = '0';
@@ -1260,21 +1216,15 @@ window.addEventListener('keydown', (e) => {
 		if (currentState === States.FLYING) {
 			currentState = States.PAUSED;
 			if (dialogueSystem) dialogueSystem.pause();
-			uiContainer.classList.add('hidden');
-			const weaponsHud = document.getElementById('weapons-hud');
-			if (weaponsHud) weaponsHud.classList.add('hidden');
-			pauseMenu.classList.remove('hidden');
-			hud.resizeMinimap();
+			uiContainer.classList.add('hidden');			pauseMenu.classList.remove('hidden');
+			// hud.resizeMinimap();
 			pauseGameplaySounds();
 			hud.update(state, []);
 		} else if (currentState === States.PAUSED) {
 			currentState = States.FLYING;
 			if (dialogueSystem) dialogueSystem.resume();
 			pauseMenu.classList.add('hidden');
-			uiContainer.classList.remove('hidden');
-			const weaponsHud = document.getElementById('weapons-hud');
-			if (weaponsHud) weaponsHud.classList.remove('hidden');
-			resumeGameplaySounds();
+			uiContainer.classList.remove('hidden');			resumeGameplaySounds();
 		} else if (currentState === States.PICK_SPAWN && key === 'escape') {
 			exitSpawnPicking();
 		}
@@ -1291,7 +1241,7 @@ document.addEventListener('visibilitychange', () => {
 		if (dialogueSystem) dialogueSystem.pause();
 		uiContainer.classList.add('hidden');
 		pauseMenu.classList.remove('hidden');
-		hud.resizeMinimap();
+		// hud.resizeMinimap();
 		pauseGameplaySounds();
 		hud.update(state, []);
 	}
@@ -1303,7 +1253,7 @@ window.addEventListener('blur', () => {
 		if (dialogueSystem) dialogueSystem.pause();
 		uiContainer.classList.add('hidden');
 		pauseMenu.classList.remove('hidden');
-		hud.resizeMinimap();
+		// hud.resizeMinimap();
 		pauseGameplaySounds();
 		hud.update(state, []);
 	}
@@ -1358,7 +1308,7 @@ initialCameraView = {
 initThree();
 npcSystem = new NPCSystem(viewer, scene, new GLTFLoader());
 setupSpawnPicker();
-setupLocationSearch();
+// setupLocationSearch();
 loadSettings();
 
 uiContainer.classList.add('hidden');

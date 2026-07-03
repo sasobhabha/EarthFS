@@ -11,13 +11,7 @@ export class HUD {
 		this.fpsElem = document.getElementById('fps');
 		this.localDateTimeElem = document.getElementById('local-datetime');
 		this.coordsElem = document.getElementById('coords');
-		this.minimapCanvas = document.getElementById('minimap');
-		this.miniCtx = this.minimapCanvas.getContext('2d');
 
-		this.pauseMinimapCanvas = document.getElementById('pauseMinimap');
-		if (this.pauseMinimapCanvas) {
-			this.pauseMiniCtx = this.pauseMinimapCanvas.getContext('2d');
-		}
 		this.pauseRegionElem = document.getElementById('pause-region');
 		this.pauseLatElem = document.getElementById('pause-lat');
 		this.pauseLonElem = document.getElementById('pause-lon');
@@ -39,21 +33,6 @@ export class HUD {
 		this.killScoreElem = document.getElementById('kill-score');
 		this.killTimeout = null;
 
-		this.weaponElems = {
-			gun: document.getElementById('weapon-gun'),
-			missile: document.getElementById('weapon-missile'),
-			flare: document.getElementById('weapon-flare')
-		};
-		this.weaponAmmoElems = {
-			gun: this.weaponElems.gun.querySelector('.weapon-ammo'),
-			missile: this.weaponElems.missile.querySelector('.weapon-ammo'),
-			flare: this.weaponElems.flare.querySelector('.weapon-ammo')
-		};
-		this.weaponProgressElems = {
-			gun: this.weaponElems.gun.querySelector('.weapon-progress'),
-			missile: this.weaponElems.missile.querySelector('.weapon-progress'),
-			flare: this.weaponElems.flare.querySelector('.weapon-progress')
-		};
 
 		this.vignette = document.getElementById('transition-vignette');
 
@@ -103,15 +82,15 @@ export class HUD {
 		innerRing.style.cssText = `
 			position:absolute; left:50%; top:50%; width:76px; height:76px; transform:translate(-50%,-50%);
 			border-radius:50%;
-			border:2px solid #0f0;
+			border:2px solid #f00;
 		`;
 
 		const centerDot = document.createElement('div');
-		centerDot.style.cssText = `position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:10px; height:10px; border-radius:50%; background:#0f0;`;
+		centerDot.style.cssText = `position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:10px; height:10px; border-radius:50%; background:#f00;`;
 
 		const makeTick = (left, top, w, h, translate) => {
 			const t = document.createElement('div');
-			t.style.cssText = `position:absolute; left:${left}; top:${top}; width:${w}; height:${h}; background:#0f0; transform:${translate};`;
+			t.style.cssText = `position:absolute; left:${left}; top:${top}; width:${w}; height:${h}; background:#f00; transform:${translate};`;
 			return t;
 		};
 
@@ -286,6 +265,7 @@ export class HUD {
 	}
 
 	resizeMinimap() {
+		return;
 		requestAnimationFrame(() => {
 			this.minimapCanvas.width = this.minimapCanvas.offsetWidth;
 			this.minimapCanvas.height = this.minimapCanvas.offsetHeight;
@@ -328,16 +308,16 @@ export class HUD {
 			crosshair.style.cssText = 'position:absolute; top:50%; left:50%; width:120px; height:48px; transform:translate(-50%,-50%); pointer-events:none;';
 
 			const ring = document.createElement('div');
-			ring.style.cssText = 'position:absolute; left:50%; top:50%; width:12px; height:12px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid #0f0; background:transparent;';
+			ring.style.cssText = 'position:absolute; left:50%; top:50%; width:12px; height:12px; transform:translate(-50%,-50%); border-radius:50%; border:2px solid #f00; background:transparent;';
 
 			const leftLine = document.createElement('div');
-			leftLine.style.cssText = 'position:absolute; top:50%; left:calc(50% - 6px - 20px); width:20px; height:2px; transform:translateY(-50%); background:#0f0;';
+			leftLine.style.cssText = 'position:absolute; top:50%; left:calc(50% - 6px - 20px); width:20px; height:2px; transform:translateY(-50%); background:#f00;';
 
 			const rightLine = document.createElement('div');
-			rightLine.style.cssText = 'position:absolute; top:50%; left:calc(50% + 6px); width:20px; height:2px; transform:translateY(-50%); background:#0f0;';
+			rightLine.style.cssText = 'position:absolute; top:50%; left:calc(50% + 6px); width:20px; height:2px; transform:translateY(-50%); background:#f00;';
 
 			const topTick = document.createElement('div');
-			topTick.style.cssText = 'position:absolute; left:50%; top:calc(50% - 6px - 12px); width:2px; height:12px; transform:translateX(-50%); background:#0f0;';
+			topTick.style.cssText = 'position:absolute; left:50%; top:calc(50% - 6px - 12px); width:2px; height:12px; transform:translateX(-50%); background:#f00;';
 
 			crosshair.appendChild(leftLine);
 			crosshair.appendChild(rightLine);
@@ -361,7 +341,7 @@ export class HUD {
 					left: 30%;
 					width: 40%;
 					height: 1px;
-					background: rgba(0, 255, 0, 0.5);
+					background: rgba(255, 0, 0, 0.5);
 					top: ${50 - i}% ;
 					text-align: center;
 					font-size: 10px;
@@ -409,6 +389,7 @@ export class HUD {
 			this.pauseTimeElem.innerText = `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}Z`;
 		}
 
+		return;
 		const zoomAlt = this.minimapRange * 10000;
 		setPauseMinimapCamera(state.lon, state.lat, zoomAlt, 0);
 
@@ -421,7 +402,7 @@ export class HUD {
 
 		ctx.clearRect(0, 0, w, h);
 
-		ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
+		ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
 		ctx.lineWidth = 1;
 		const gridSize = 50;
 
@@ -440,7 +421,7 @@ export class HUD {
 		}
 		ctx.stroke();
 
-		ctx.strokeStyle = '#0f0';
+		ctx.strokeStyle = '#f00';
 		ctx.lineWidth = 2;
 		const size = 15;
 		ctx.beginPath();
@@ -448,7 +429,7 @@ export class HUD {
 		ctx.moveTo(centerX, centerY - size); ctx.lineTo(centerX, centerY + size);
 		ctx.stroke();
 
-		ctx.fillStyle = '#0f0';
+		ctx.fillStyle = '#f00';
 		ctx.font = '12px AceCombat';
 		ctx.fillText("YOU", centerX + 20, centerY + 5);
 
@@ -638,6 +619,7 @@ export class HUD {
 	}
 
 	drawMinimap(state, npcs = []) {
+		return;
 		if (!this.miniCtx || !this.minimapCanvas) return;
 
 		const ctx = this.miniCtx;
@@ -655,7 +637,7 @@ export class HUD {
 		const heading = this.smoothedHeading;
 		ctx.rotate(-heading * Math.PI / 180);
 
-		ctx.strokeStyle = 'rgba(0, 255, 0, 0.35)';
+		ctx.strokeStyle = 'rgba(255, 0, 0, 0.35)';
 		ctx.lineWidth = 1.0;
 
 		const metersPerGrid = this.minimapRange * 1000;
@@ -717,7 +699,7 @@ export class HUD {
 		const edgeX = centerX - pad;
 		const edgeY = centerY - pad;
 
-		ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+		ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
 		ctx.lineWidth = 1.2;
 		ctx.beginPath();
 		ctx.moveTo(0, centerY);
@@ -740,7 +722,7 @@ export class HUD {
 		ctx.lineTo(centerX + Math.sin(halfHFov) * fovLineLen, centerY - Math.cos(halfHFov) * fovLineLen);
 		ctx.stroke();
 
-		ctx.fillStyle = '#0f0';
+		ctx.fillStyle = '#f00';
 		ctx.font = `bold 16px ${getComputedStyle(document.body).fontFamily}`;
 		ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
 		ctx.shadowBlur = 4;
@@ -774,7 +756,7 @@ export class HUD {
 
 		ctx.save();
 		ctx.translate(centerX, centerY);
-		ctx.fillStyle = '#0f0';
+		ctx.fillStyle = '#f00';
 		ctx.shadowBlur = 0;
 		ctx.beginPath();
 		ctx.moveTo(0, -12);
@@ -784,7 +766,7 @@ export class HUD {
 		ctx.closePath();
 		ctx.fill();
 
-		ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+		ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
 		ctx.lineWidth = 1.2;
 		ctx.beginPath();
 		ctx.arc(0, 0, circleRadius, 0, Math.PI * 2);
@@ -793,7 +775,7 @@ export class HUD {
 		ctx.restore();
 
 		const sweepTime = (Date.now() / 1500) % 1;
-		ctx.strokeStyle = `rgba(0, 255, 0, ${0.7 * (1 - sweepTime)})`;
+		ctx.strokeStyle = `rgba(255, 0, 0, ${0.7 * (1 - sweepTime)})`;
 		ctx.lineWidth = 1.2;
 		ctx.beginPath();
 		ctx.arc(centerX, centerY, sweepTime * circleRadius, 0, Math.PI * 2);
@@ -910,11 +892,11 @@ export class HUD {
 			marker.lockBox.style.display = 'block';
 			if (ws.lockStatus === 'LOCKED') {
 				marker.lockBox.classList.remove('locking-blink');
-				marker.lockBox.style.borderColor = '#0f0';
-				marker.lockBox.innerHTML = '<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-weight:bold; color:#0f0; font-size:12px; text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);">LOCK</span>';
+				marker.lockBox.style.borderColor = '#f00';
+				marker.lockBox.innerHTML = '<span style="position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-weight:bold; color:#f00; font-size:12px; text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);">LOCK</span>';
 			} else if (ws.lockStatus === 'LOCKING') {
 				marker.lockBox.classList.add('locking-blink');
-				marker.lockBox.style.borderColor = '#0f0';
+				marker.lockBox.style.borderColor = '#f00';
 				marker.lockBox.innerHTML = '';
 			}
 		} else {

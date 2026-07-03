@@ -1,5 +1,5 @@
 {
-  "name": "earthfs",
+  "name": "marsfs",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@types/three": "^0.185.0",
+    "puppeteer": "^25.3.0",
     "typescript": "~6.0.2",
     "vite": "^8.1.1"
   },

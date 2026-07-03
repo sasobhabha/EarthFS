@@ -5,33 +5,64 @@ let miniViewer;
 let pauseMiniViewer;
 
 export function initCesium() {
+	Cesium.Ellipsoid.default = Cesium.Ellipsoid.MARS;
+
 	viewer = new Cesium.Viewer("cesiumContainer", {
 		terrain: undefined,
 		timeline: false,
 		animation: false,
 		baseLayerPicker: false,
-		geocoder: Cesium.IonGeocodeProviderType.GOOGLE,
+		baseLayer: false,
+		geocoder: false,
+		shadows: false,
 		homeButton: false,
 		infoBox: false,
 		sceneModePicker: false,
 		selectionIndicator: false,
 		navigationHelpButton: false,
-		shouldAnimate: false
+		shouldAnimate: false,
+		globe: new Cesium.Globe(Cesium.Ellipsoid.MARS),
+		skyBox: Cesium.SkyBox.createEarthSkyBox(),
+		skyAtmosphere: new Cesium.SkyAtmosphere(Cesium.Ellipsoid.MARS),
 	});
 
 	// Hide the globe so it doesn't conflict with Photorealistic 3D Tiles
 	viewer.scene.globe.show = false;
 
-	// Attempt to add Photorealistic 3D Tiles
-	Cesium.createGooglePhotorealistic3DTileset({
-		onlyUsingWithGoogleGeocoder: true,
+	const scene = viewer.scene;
+	scene.skyAtmosphere.atmosphereMieCoefficient = new Cesium.Cartesian3(
+		9.0e-5,
+		2.0e-5,
+		1.0e-5,
+	);
+	scene.skyAtmosphere.atmosphereRayleighCoefficient = new Cesium.Cartesian3(
+		9.0e-6,
+		2.0e-6,
+		1.0e-6,
+	);
+	scene.skyAtmosphere.atmosphereRayleighScaleHeight = 9000;
+	scene.skyAtmosphere.atmosphereMieScaleHeight = 2700.0;
+	scene.skyAtmosphere.saturationShift = -0.1;
+	scene.skyAtmosphere.perFragmentAtmosphere = true;
+
+	const bloom = viewer.scene.postProcessStages.bloom;
+	bloom.enabled = true;
+	bloom.uniforms.brightness = -0.5;
+	bloom.uniforms.stepSize = 1.0;
+	bloom.uniforms.sigma = 3.0;
+	bloom.uniforms.delta = 1.5;
+	scene.highDynamicRange = true;
+	viewer.scene.postProcessStages.exposure = 1.5;
+
+	Cesium.Cesium3DTileset.fromIonAssetId(3644333, {
+		enableCollision: true,
 	}).then(tileset => {
 		viewer.scene.primitives.add(tileset);
 	}).catch(error => {
-		console.warn("Could not load Google Photorealistic 3D Tiles:", error);
+		console.warn("Could not load Mars 3D Tiles:", error);
 	});
 
-	miniViewer = new Cesium.Viewer("minimapCesium", {
+	/* miniViewer = new Cesium.Viewer("minimapCesium", {
 		terrain: null,
 		timeline: false,
 		animation: false,
@@ -51,9 +82,9 @@ export function initCesium() {
 				preserveDrawingBuffer: true
 			}
 		}
-	});
+	}); */
 
-	pauseMiniViewer = new Cesium.Viewer("pauseMinimapCesium", {
+	/* pauseMiniViewer = new Cesium.Viewer("pauseMinimapCesium", {
 		terrain: null,
 		timeline: false,
 		animation: false,
@@ -73,9 +104,9 @@ export function initCesium() {
 				preserveDrawingBuffer: true
 			}
 		}
-	});
+	}); */
 
-	[viewer, miniViewer, pauseMiniViewer].forEach(v => {
+	[viewer].forEach(v => {
 		v.scene.requestRenderMode = false;
 		v.scene.maximumRenderTimeChange = 0;
 		if (v.scene.globe) v.scene.globe.maximumScreenSpaceError = 2;
@@ -104,26 +135,12 @@ export function initCesium() {
 		v._cesiumWidget._creditContainer.style.display = "none";
 	});
 
-	[miniViewer, pauseMiniViewer].forEach(v => {
-		if (v.scene.globe) {
-			v.scene.globe.enableLighting = false;
-			v.scene.globe.showGroundAtmosphere = false;
-			v.scene.globe.maximumScreenSpaceError = 2;
-			v.scene.globe.baseColor = Cesium.Color.BLACK;
-		}
-		v.scene.fog.enabled = false;
-		v.scene.highDynamicRange = false;
-		v.scene.postProcessStages.fxaa.enabled = false;
-		v.resolutionScale = 1.0;
-		if (v.scene.skyAtmosphere) v.scene.skyAtmosphere.show = false;
-	});
+	
 
 	if (viewer.scene.globe) {
 		viewer.scene.globe.enableLighting = true;
 	}
-	viewer.scene.highDynamicRange = false;
 	viewer.scene.postProcessStages.fxaa.enabled = true;
-	viewer.scene.skyAtmosphere = new Cesium.SkyAtmosphere();
 	viewer.scene.skyAtmosphere.show = true;
 
 	viewer.scene.fog.enabled = true;
@@ -135,9 +152,9 @@ export function initCesium() {
 }
 
 export function setRenderOptimization(isMenu) {
-	if (!viewer || !miniViewer || !pauseMiniViewer) return;
+	if (!viewer) return;
 
-	[viewer, miniViewer, pauseMiniViewer].forEach(v => {
+	[viewer].forEach(v => {
 		v.scene.requestRenderMode = !isMenu;
 		v.scene.maximumRenderTimeChange = !isMenu ? Infinity : 0;
 	});
