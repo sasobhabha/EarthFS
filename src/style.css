@@ -1874,3 +1874,79 @@ input[type="range"]::-webkit-slider-thumb {
 	font-weight: bold;
 	font-size: 11px;
 }
+
+/* Mobile Controls */
+#mobile-controls {
+	position: absolute;
+	bottom: 20px;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 0 20px;
+	pointer-events: none;
+	z-index: 100;
+}
+
+#mobile-controls.hidden {
+	display: none;
+}
+
+.mobile-dpad, .mobile-action-buttons {
+	pointer-events: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+.m-dpad-middle {
+	display: flex;
+	gap: 10px;
+}
+
+.mobile-action-buttons {
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+.m-btn {
+	background: rgba(0, 255, 0, 0.2);
+	border: 1px solid #0f0;
+	color: #0f0;
+	font-family: monospace;
+	font-size: 20px;
+	font-weight: bold;
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+}
+
+.m-btn:active, .m-btn.active {
+	background: rgba(0, 255, 0, 0.6);
+	box-shadow: 0 0 10px #0f0;
+}
+
+.m-space {
+	width: 100px;
+	height: 60px;
+	border-radius: 30px;
+	font-size: 16px;
+}
+
+@media (max-width: 768px) {
+	#minimap-container,
+	#pause-minimap-container {
+		display: none !important;
+	}
+	
+	#coords {
+		bottom: 30px;
+	}
+}

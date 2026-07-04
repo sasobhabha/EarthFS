@@ -68,10 +68,10 @@ export class PlaneController {
 		const pitchTarget = (this.keys['arrowup'] ? -1 : (this.keys['arrowdown'] ? 1 : 0));
 		this.input.pitch = this.lerp(this.input.pitch, pitchTarget, 0.1);
 
-		const rollTarget = (this.keys['arrowleft'] ? -1 : (this.keys['arrowright'] ? 1 : 0));
+		const rollTarget = (this.keys['a'] ? -1 : (this.keys['d'] ? 1 : 0));
 		this.input.roll = this.lerp(this.input.roll, rollTarget, 0.1);
 
-		const yawTarget = (this.keys['a'] ? -1 : (this.keys['d'] ? 1 : 0));
+		const yawTarget = (this.keys['arrowleft'] ? -1 : (this.keys['arrowright'] ? 1 : 0));
 		this.input.yaw = this.lerp(this.input.yaw, yawTarget, 0.1);
 
 		if (this.mouseDragging) {

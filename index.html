@@ -139,9 +139,9 @@
 				<div class="key">UP / DOWN</div>
 				<div>Pitch Down / Up</div>
 				<div class="key">LEFT / RIGHT</div>
-				<div>Roll Left / Right</div>
-				<div class="key">A / D</div>
 				<div>Yaw (Rudder)</div>
+				<div class="key">A / D</div>
+				<div>Roll Left / Right</div>
 				<div class="key">W / S</div>
 				<div>Throttle +/-</div>
 				<div class="key">SPACE</div>
@@ -224,7 +224,7 @@
 						<span class="map-title">TACTICAL MAP</span>
 						<span id="pause-region" class="map-location">UNKNOWN REGION</span>
 					</div>
-					<div id="pause-minimap-container">
+					<div id="pause-minimap-container" style="display: none !important;">
 						<div id="pauseMinimapCesium"></div>
 						<canvas id="pauseMinimap"></canvas>
 					</div>
@@ -317,7 +317,7 @@
 
 
 
-		<div id="minimap-container">
+		<div id="minimap-container" style="display: none !important;">
 			<div id="minimapCesium"></div>
 			<canvas id="minimap"></canvas>
 		</div>
@@ -334,6 +334,28 @@
 					<div id="dialogue-text"></div>
 					<div class="dialogue-hint">Press Z to skip</div>
 				</div>
+			</div>
+		</div>
+
+		<div id="mobile-controls" class="hidden">
+			<div class="mobile-dpad">
+				<button class="m-btn m-w" data-key="arrowup">▲</button>
+				<div class="m-dpad-middle">
+					<button class="m-btn m-a" data-key="arrowleft">◀</button>
+					<button class="m-btn m-s" data-key="arrowdown">▼</button>
+					<button class="m-btn m-d" data-key="arrowright">▶</button>
+				</div>
+			</div>
+			<div class="mobile-action-buttons">
+				<div style="display:flex; flex-direction:column; align-items:center; gap: 5px;">
+					<button class="m-btn" data-key="w" style="width:40px; height:40px; font-size:16px;">W</button>
+					<div style="display:flex; gap: 5px;">
+						<button class="m-btn" data-key="a" style="width:40px; height:40px; font-size:16px;">A</button>
+						<button class="m-btn" data-key="s" style="width:40px; height:40px; font-size:16px;">S</button>
+						<button class="m-btn" data-key="d" style="width:40px; height:40px; font-size:16px;">D</button>
+					</div>
+				</div>
+				<button class="m-btn m-space" data-key=" ">BOOST</button>
 			</div>
 		</div>
 	</div>

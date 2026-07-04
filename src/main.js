@@ -1342,3 +1342,44 @@ window.addEventListener('resize', () => {
 window.addEventListener('contextmenu', (e) => {
 	e.preventDefault();
 }, false);
+
+function setupMobileControls() {
+	const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+	if (!isMobile) return;
+
+	const mobileControls = document.getElementById('mobile-controls');
+	if (mobileControls) {
+		mobileControls.classList.remove('hidden');
+
+		const buttons = mobileControls.querySelectorAll('.m-btn');
+		buttons.forEach(btn => {
+			const key = btn.getAttribute('data-key');
+			
+			const handleStart = (e) => {
+				e.preventDefault();
+				if (!btn.classList.contains('active')) {
+					btn.classList.add('active');
+					window.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
+				}
+			};
+			
+			const handleEnd = (e) => {
+				e.preventDefault();
+				if (btn.classList.contains('active')) {
+					btn.classList.remove('active');
+					window.dispatchEvent(new KeyboardEvent('keyup', { key: key }));
+				}
+			};
+
+			btn.addEventListener('touchstart', handleStart, { passive: false });
+			btn.addEventListener('touchend', handleEnd, { passive: false });
+			btn.addEventListener('touchcancel', handleEnd, { passive: false });
+			
+			btn.addEventListener('mousedown', handleStart);
+			btn.addEventListener('mouseup', handleEnd);
+			btn.addEventListener('mouseleave', handleEnd);
+		});
+	}
+}
+
+setupMobileControls();
